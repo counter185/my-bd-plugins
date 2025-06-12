@@ -189,12 +189,13 @@ module.exports = class YourPlugin {
             messageList.querySelectorAll(`.${CLASS_MESSAGE_CONTENT}`).forEach((message) => {
                 this.transformMessage(message);
             });
+
+            this.observer.observe(messageList, {
+                childList: true,
+                subtree: true,
+                characterData: true,
+            });
         }
-        this.observer.observe(messageList, {
-            childList: true,
-            subtree: true,
-            characterData: true,
-        });
     }
 
     openMagnetLinkNative(link) {
