@@ -5,6 +5,7 @@
  * @version 0.0.1
  */
 
+const CLASS_SCROLLER_INNER = BdApi.Webpack.getByKeys("navigationDescription", "scrollerInner")["scrollerInner"];
 const CLASS_HIDDEN_MESSAGE = BdApi.Webpack.getByKeys("blockedSystemMessage")["blockedSystemMessage"]
 const CLASS_BLOCKED_MESSAGE_TEXT = BdApi.Webpack.getByKeys("blockedMessageText")["blockedMessageText"]
 const CLASS_BLOCKED_ACTION = BdApi.Webpack.getByKeys("blockedAction")["blockedAction"]
@@ -67,13 +68,16 @@ module.exports = class YourPlugin {
         }
         this.observer = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
-                console.log(mutation.type);
+                //console.log(mutation.type);
                 if (mutation.type == "childList") {
                     for (const node of mutation.addedNodes) {
                         if (node.classList) {
 
-                            if (node.classList.contains(CLASS_HIDDEN_MESSAGE)) {
-                                this.handleBlockedMessageList(node);
+                            if (node.classList.contains(CLASS_GROUP_START)) {
+                                var findHidden = node.querySelector(`.${CLASS_HIDDEN_MESSAGE}`);
+                                if (findHidden) {
+                                    this.handleBlockedMessageList(findHidden);
+                                }
                             }
 
                         }
@@ -90,16 +94,16 @@ module.exports = class YourPlugin {
             }
         });
 
-        var hiddenMessages = document.querySelectorAll(`.${CLASS_HIDDEN_MESSAGE}`);
-        if (hiddenMessages) {
-            hiddenMessages.forEach((x)=> {
+        var messageList = document.querySelector(`.${CLASS_SCROLLER_INNER}`);
+        if (messageList) {
+            document.querySelectorAll(`.${CLASS_HIDDEN_MESSAGE}`).forEach((x)=> {
                 this.handleBlockedMessageList(x);
-                /*this.observer.observe(x, {
-                    childList: true,
-                    subtree: true,
-                    characterData: true,
-                });*/
-            })
+            });
+
+            this.observer.observe(messageList, {
+                childList: true,
+                subtree: true
+            });
         }
     }
 }
